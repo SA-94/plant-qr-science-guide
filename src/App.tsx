@@ -19,12 +19,19 @@ import './App.css'
 
 const otherLang = (lang: Lang): Lang => (lang === 'ar' ? 'en' : 'ar')
 const basePath = import.meta.env.BASE_URL.replace(/\/$/, '')
-const appPath = (path: string) => (basePath ? `${basePath}${path === '/' ? '/' : path}` : path)
+const appPath = (path: string) => {
+  if (!basePath) return path
+  return path === '/' ? `${basePath}/` : `${basePath}/#${path}`
+}
 const assetPath = (path: string) => (basePath && path.startsWith('/') ? `${basePath}${path}` : path)
 const plantRoute = (plant: Plant) => `/plant/${plant.id}`
 const plantPath = (plant: Plant) => appPath(plantRoute(plant))
 
 const normalizePath = () => {
+  if (basePath && window.location.hash.startsWith('#/')) {
+    return window.location.hash.slice(1).replace(/\/+$/, '') || '/'
+  }
+
   let path = window.location.pathname
   if (basePath && path.startsWith(basePath)) {
     path = path.slice(basePath.length) || '/'
