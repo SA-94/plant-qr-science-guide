@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   ArrowLeft,
   BookOpen,
@@ -323,13 +323,24 @@ const getPracticalProfile = (plant: Plant) => practicalProfiles[plant.id]
 function App() {
   const [lang, setLang] = useState<Lang>('ar')
   const [query, setQuery] = useState('')
-  const path = normalizePath()
+  const [path, setPath] = useState(normalizePath)
   const t = labels[lang]
   const alternate = otherLang(lang)
   const dir = lang === 'ar' ? 'rtl' : 'ltr'
 
   const plantId = path.startsWith('/plant/') ? decodeURIComponent(path.replace('/plant/', '')) : ''
   const selectedPlant = plantId ? getPlantById(plantId) : undefined
+
+  useEffect(() => {
+    const syncPath = () => setPath(normalizePath())
+
+    window.addEventListener('hashchange', syncPath)
+    window.addEventListener('popstate', syncPath)
+    return () => {
+      window.removeEventListener('hashchange', syncPath)
+      window.removeEventListener('popstate', syncPath)
+    }
+  }, [])
 
   const filteredPlants = useMemo(() => {
     const needle = query.trim().toLowerCase()
