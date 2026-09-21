@@ -26,3 +26,6 @@ vite-*.err.log
 *.njsproj
 *.sln
 *.sw?
+
+# Local agent/editor config
+.claude/
