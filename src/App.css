@@ -320,28 +320,6 @@ main {
 
 /* ---------- plant page ---------- */
 
-.back-link,
-.button-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  margin-bottom: 22px;
-  color: var(--brand);
-  font-size: 0.88rem;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.back-link:hover,
-.button-link:hover {
-  text-decoration: underline;
-}
-
-[dir='rtl'] .back-link svg,
-[dir='rtl'] .button-link svg {
-  transform: scaleX(-1);
-}
-
 .plant-hero {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
@@ -402,26 +380,6 @@ main {
   font-size: 1rem;
   line-height: 1.8;
   color: var(--muted-strong);
-}
-
-.copy-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 18px;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--brand);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.18s ease, border-color 0.18s ease;
-}
-
-.copy-link:hover {
-  background: var(--brand-soft);
-  border-color: var(--brand);
 }
 
 .care-grid {
@@ -529,6 +487,17 @@ main {
   margin: 0;
   font-size: 1.3rem;
   color: var(--ink);
+}
+
+.button-link {
+  color: var(--brand);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.button-link:hover {
+  text-decoration: underline;
 }
 
 /* ---------- footer ---------- */

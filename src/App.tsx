@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ArrowLeft, Check, Download, ExternalLink, Leaf, Link2, Printer, QrCode } from 'lucide-react'
+import { Download, ExternalLink, Leaf, Printer, QrCode } from 'lucide-react'
 import { getPlantById, labels, type Lang, type Plant, plants } from './data'
 import { getProfile } from './profiles'
 import { drawPlantQr, loadImage } from './qr'
@@ -67,7 +67,7 @@ function App() {
 
   return (
     <div className="app" dir={dir}>
-      <SiteHeader lang={lang} setLang={setLang} />
+      <SiteHeader lang={lang} setLang={setLang} showQrLink={!selectedPlant} />
 
       {selectedPlant ? (
         <PlantPage plant={selectedPlant} lang={lang} />
@@ -90,7 +90,16 @@ function App() {
   )
 }
 
-function SiteHeader({ lang, setLang }: { lang: Lang; setLang: (lang: Lang) => void }) {
+function SiteHeader({
+  lang,
+  setLang,
+  showQrLink,
+}: {
+  lang: Lang
+  setLang: (lang: Lang) => void
+  /** Hidden on plant pages: someone arriving by QR is there for that one plant. */
+  showQrLink: boolean
+}) {
   const t = labels[lang]
 
   return (
@@ -103,10 +112,12 @@ function SiteHeader({ lang, setLang }: { lang: Lang; setLang: (lang: Lang) => vo
         </span>
       </a>
       <div className="header-actions">
-        <a href={appPath('/qr')} className="qr-nav-link">
-          <QrCode size={16} aria-hidden="true" />
-          {t.qr}
-        </a>
+        {showQrLink ? (
+          <a href={appPath('/qr')} className="qr-nav-link">
+            <QrCode size={16} aria-hidden="true" />
+            {t.qr}
+          </a>
+        ) : null}
         <button type="button" className="lang-button" onClick={() => setLang(otherLang(lang))}>
           {t.language}
         </button>
@@ -221,11 +232,6 @@ function PlantPage({ plant, lang }: { plant: Plant; lang: Lang }) {
 
   return (
     <main className="plant-page">
-      <a href={appPath('/')} className="back-link">
-        <ArrowLeft size={16} aria-hidden="true" />
-        {t.back}
-      </a>
-
       <section className="plant-hero">
         <figure className="plant-photo">
           <img src={assetPath(plant.image)} alt={plant.commonName[lang]} />
@@ -238,7 +244,6 @@ function PlantPage({ plant, lang }: { plant: Plant; lang: Lang }) {
             {family}
           </p>
           <p className="tagline">{profile.tagline[lang]}</p>
-          <CopyLinkButton lang={lang} />
         </div>
       </section>
 
@@ -268,33 +273,6 @@ function PlantPage({ plant, lang }: { plant: Plant; lang: Lang }) {
         </ul>
       </section>
     </main>
-  )
-}
-
-function CopyLinkButton({ lang }: { lang: Lang }) {
-  const t = labels[lang]
-  const [copied, setCopied] = useState(false)
-
-  useEffect(() => {
-    if (!copied) return
-    const timer = window.setTimeout(() => setCopied(false), 2000)
-    return () => window.clearTimeout(timer)
-  }, [copied])
-
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href)
-      setCopied(true)
-    } catch {
-      setCopied(false)
-    }
-  }
-
-  return (
-    <button type="button" className="copy-link" onClick={copy}>
-      {copied ? <Check size={15} aria-hidden="true" /> : <Link2 size={15} aria-hidden="true" />}
-      {copied ? t.copied : t.copyLink}
-    </button>
   )
 }
 
