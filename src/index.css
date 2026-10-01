@@ -9,6 +9,18 @@
   --brand: #0d4f3c;
   --brand-soft: #e9f1ed;
   --gold: #a87f33;
+  --sun: #e8a417;
+  --sun-soft: #fbf0d4;
+  --sun-ink: #8a5d00;
+  --water: #2b7cc0;
+  --water-soft: #ddeaf6;
+  --water-ink: #1d5a8f;
+  --temp: #d4643a;
+  --temp-soft: #f8e2d8;
+  --humid: #2a9488;
+  --humid-soft: #d6efec;
+  --danger: #b4412f;
+  --danger-soft: #fbece8;
   --serif: 'Times New Roman', Georgia, serif;
 
   font-family: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, ui-sans-serif, system-ui, sans-serif;
@@ -47,6 +59,15 @@ svg {
 :focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 ::selection {

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { Download, ExternalLink, Leaf, Printer, QrCode } from 'lucide-react'
+import { Download, ExternalLink, Leaf, Printer, QrCode, TriangleAlert } from 'lucide-react'
 import { getPlantById, labels, type Lang, type Plant, plants } from './data'
+import { CareGuide, MiniNeeds, NeedsPanel, TraitList } from './needs'
 import { getProfile } from './profiles'
 import { drawPlantQr, loadImage } from './qr'
 import './App.css'
@@ -145,6 +146,7 @@ function HomePage({ lang }: { lang: Lang }) {
             <span className="plant-card-copy">
               <strong>{primaryName(plant.commonName[lang])}</strong>
               <em>{plant.scientificName}</em>
+              <MiniNeeds needs={getProfile(plant.id).needs} lang={lang} />
             </span>
           </a>
         ))}
@@ -244,17 +246,17 @@ function PlantPage({ plant, lang }: { plant: Plant; lang: Lang }) {
             {family}
           </p>
           <p className="tagline">{profile.tagline[lang]}</p>
+          <TraitList needs={profile.needs} use={profile.use[lang]} lang={lang} />
+          <p className="caution">
+            <TriangleAlert size={18} aria-hidden="true" />
+            {profile.caution[lang]}
+          </p>
         </div>
       </section>
 
-      <section className="care-grid" aria-label={t.care}>
-        {profile.stats.map((item) => (
-          <article className="care-card" key={item.label.en}>
-            <strong>{item.label[lang]}</strong>
-            <span>{item.value[lang]}</span>
-          </article>
-        ))}
-      </section>
+      <NeedsPanel needs={profile.needs} lang={lang} />
+
+      <CareGuide sections={profile.sections} lang={lang} key={plant.id} />
 
       <section className="references">
         <h2>{t.references}</h2>
