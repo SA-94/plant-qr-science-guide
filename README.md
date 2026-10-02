@@ -1,8 +1,8 @@
 # دليل النباتات | Plant QR Science Guide
 
-موقع ثنائي اللغة (عربي/إنجليزي) يعرض صفحة علمية لكل نبتة من ست نباتات مصوّرة، مع رموز QR مخصصة تفتح صفحة كل نبتة مباشرة.
+موقع ثنائي اللغة (عربي/إنجليزي) يعرض صفحة علمية لكل نبتة من سبع نباتات، مع رموز QR مخصصة تفتح صفحة كل نبتة مباشرة.
 
-A bilingual Arabic/English guide with a scientific page for each of six photographed plants, plus custom QR codes that open each plant page directly.
+A bilingual Arabic/English guide with a scientific page for each of seven plants, plus custom QR codes that open each plant page directly.
 
 عمل الطالب **فهد عبدالله فهيد القحطاني** — بإشراف الدكتور **محمد صالح آدم عبدالله** — جامعة الملك فيصل.
 
@@ -28,6 +28,7 @@ npm run build
 | جلد النمر / Snake plant | `/plant/dracaena-trifasciata` | `/p/4` |
 | زاميا / ZZ plant | `/plant/zamioculcas-zamiifolia` | `/p/5` |
 | جلد النمر القزمي / Golden Hahnii | `/plant/dracaena-trifasciata-golden-hahnii` | `/p/6` |
+| جلد النمر زيلانيكا / Zeylanica snake plant | `/plant/dracaena-trifasciata-zeylanica` | `/p/7` |
 
 صفحة رموز QR للطباعة على `/qr`.
 

@@ -779,6 +779,112 @@ export const plants: Plant[] = [
       },
     ],
   },
+  {
+    id: 'dracaena-trifasciata-zeylanica',
+    index: 7,
+    image: '/plants/07-dracaena-trifasciata-zeylanica.jpeg',
+    accent: '#4a7a55',
+    commonName: {
+      ar: 'جلد النمر زيلانيكا / Zeylanica Snake Plant',
+      en: 'Zeylanica snake plant',
+    },
+    scientificName: "Dracaena trifasciata 'Zeylanica'",
+    subtitle: {
+      ar: 'جلد نمر طويل بأوراق فاتحة وأشرطة خضراء داكنة متعرجة، يُباع تجاريًا باسم Sansevieria zeylanica.',
+      en: 'A tall snake plant with pale leaves and dark green zigzag bands, sold in the trade as Sansevieria zeylanica.',
+    },
+    confidence: {
+      ar: 'مطابقة عالية للشكل التجاري «Zeylanica». الأشكال غير المبرقشة من جلد النمر تُباع غالبًا بهذا الاسم، أما النوع الحقيقي Dracaena zeylanica (سريلانكا وجنوب الهند) فنادر في الزراعة.',
+      en: 'High match for the trade form "Zeylanica". Non-variegated snake plants are usually sold under this name; the true Dracaena zeylanica (Sri Lanka and southern India) is rare in cultivation.',
+    },
+    confidenceLevel: 'qualified',
+    summary: {
+      ar: 'شكل غير مبرقش من Dracaena trifasciata بأوراق قائمة سيفية فاتحة اللون تعبرها أشرطة خضراء داكنة. يُعامل في العناية مثل جلد النمر: صرف قوي وري قليل.',
+      en: 'A non-variegated form of Dracaena trifasciata with upright, sword-like pale leaves crossed by dark green bands. Care is the same as for snake plant: strong drainage and sparse watering.',
+    },
+    taxonomy: [
+      {
+        label: { ar: 'العائلة', en: 'Family' },
+        value: { ar: 'Asparagaceae - الهليونية', en: 'Asparagaceae - asparagus family' },
+      },
+      {
+        label: { ar: 'الحالة التصنيفية', en: 'Taxonomic status' },
+        value: { ar: 'اسم تجاري لشكل من Dracaena trifasciata؛ Sansevieria zeylanica اسم يخص نوعًا آخر هو Dracaena zeylanica.', en: 'Trade name for a form of Dracaena trifasciata; Sansevieria zeylanica properly belongs to another species, Dracaena zeylanica.' },
+      },
+      {
+        label: { ar: 'الموطن الأصلي', en: 'Native range' },
+        value: { ar: 'النوع الأم: جنوب نيجيريا إلى غرب أفريقيا المدارية الوسطى وتنزانيا.', en: 'Parent species: southern Nigeria to west-central tropical Africa and Tanzania.' },
+      },
+      {
+        label: { ar: 'النمط النباتي', en: 'Growth habit' },
+        value: { ar: 'عشبي معمر عصاري جذموري بأوراق قائمة طويلة.', en: 'Rhizomatous succulent perennial with tall upright leaves.' },
+      },
+    ],
+    care: [
+      {
+        label: { ar: 'الضوء', en: 'Light' },
+        value: { ar: 'يتحمل الضوء المنخفض، وينمو جيدًا في ضوء ساطع أو شمس جزئية.', en: 'Tolerates low light and grows well in bright light or part sun.' },
+      },
+      {
+        label: { ar: 'الري', en: 'Watering' },
+        value: { ar: 'اترك التربة تجف تمامًا بين الريات، وفي الشتاء كل شهر إلى شهرين.', en: 'Let the soil dry fully between waterings; in winter every one to two months.' },
+      },
+    ],
+    health: [
+      {
+        label: { ar: 'السمية', en: 'Toxicity' },
+        value: { ar: 'يحتوي سابونينات؛ الابتلاع قد يسبب قيئًا وغثيانًا وإسهالًا.', en: 'Contains saponins; ingestion can cause vomiting, nausea, and diarrhea.' },
+      },
+    ],
+    uses: [
+      {
+        label: { ar: 'الاستخدام', en: 'Use' },
+        value: { ar: 'نبات أرضي طويل للزوايا والمداخل.', en: 'A tall floor plant for corners and entries.' },
+      },
+    ],
+    sources: [
+      {
+        label: `${kew} - Dracaena trifasciata`,
+        url: 'https://powo.science.kew.org/taxon/77164235-1',
+        note: { ar: 'الاسم المقبول والموطن الأصلي للنوع الأم.', en: 'Accepted name and native range of the parent species.' },
+      },
+      {
+        label: `${kew} - Dracaena zeylanica`,
+        url: 'https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:77164236-1',
+        note: { ar: 'النوع الحقيقي وموطنه في جنوب الهند وسريلانكا.', en: 'The true species and its range in southern India and Sri Lanka.' },
+      },
+      {
+        label: `${ncState} - Dracaena trifasciata`,
+        url: 'https://plants.ces.ncsu.edu/plants/dracaena-trifasciata/common-name/snake-plant/',
+        note: { ar: 'العناية، الإزهار، الآفات، السمية.', en: 'Care, flowers, pests, toxicity.' },
+      },
+      {
+        label: 'Wikipedia - Dracaena zeylanica',
+        url: 'https://en.wikipedia.org/wiki/Dracaena_zeylanica',
+        note: { ar: 'سبب بيع جلد النمر باسم zeylanica والفرق بين النوعين.', en: 'Why snake plants are sold as zeylanica, and how the species differ.' },
+      },
+      {
+        label: 'Hortology - Sansevieria zeylanica',
+        url: 'https://hortology.co.uk/products/sansevieria-zeylanica-snake-plant',
+        note: { ar: 'وصف الشكل التجاري وارتفاعه.', en: 'Trade form description and height.' },
+      },
+      {
+        label: 'Costa Farms - Snake Plant guide',
+        url: 'https://help.costafarms.com/en/knowledge/the-ultimate-guide-to-caring-for-sansevieria-snake-plants',
+        note: { ar: 'الحرارة 13–29°م والري بعد الجفاف الكامل.', en: '13–29 C and watering after full dryness.' },
+      },
+      {
+        label: 'ASPCA - Snake Plant',
+        url: 'https://www.aspca.org/pet-care/aspca-poison-control/toxic-and-non-toxic-plants/snake-plant',
+        note: { ar: 'السمية للقطط والكلاب.', en: 'Toxicity to cats and dogs.' },
+      },
+      {
+        label: 'UF/IFAS - Light for Houseplants',
+        url: 'https://gardeningsolutions.ifas.ufl.edu/plants/houseplants/light-for-houseplants/',
+        note: { ar: 'مقياس شدة الضوء المستخدم في النسب.', en: 'Light scale used for the percentages.' },
+      },
+    ],
+  },
 ]
 
 export const getPlantById = (id: string) => plants.find((plant) => plant.id === id)
@@ -791,7 +897,7 @@ export const labels = {
     qr: 'رموز QR',
     searchPlaceholder: 'ابحث باسم عربي أو إنجليزي أو علمي',
     heroTitle: 'صفحات علمية واضحة لكل نبتة',
-    heroBody: 'ست صفحات ثابتة، كل صفحة تجمع الاسم العلمي، العناية، التربة، الأمراض، الاستخدامات، والروابط العلمية.',
+    heroBody: 'سبع صفحات ثابتة، كل صفحة تجمع الاسم العلمي، العناية، التربة، الأمراض، الاستخدامات، والروابط العلمية.',
     browse: 'تصفح النباتات',
     printQr: 'طباعة QR',
     sourcePolicy: 'كل معلومة مهمة مرتبطة بمصدر ظاهر داخل صفحة النبتة.',
@@ -852,7 +958,7 @@ export const labels = {
     qr: 'QR codes',
     searchPlaceholder: 'Search Arabic, English, or scientific name',
     heroTitle: 'Clear scientific pages for every plant',
-    heroBody: 'Six stable pages covering scientific names, care, soil, diseases, uses, safety, and visible source links.',
+    heroBody: 'Seven stable pages covering scientific names, care, soil, diseases, uses, safety, and visible source links.',
     browse: 'Browse plants',
     printQr: 'Print QR',
     sourcePolicy: 'Every key claim is tied to a visible source on the plant page.',

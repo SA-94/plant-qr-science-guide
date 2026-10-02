@@ -398,6 +398,70 @@ const practicalProfiles: Record<string, PracticalProfile> = {
       },
     ],
   },
+  'dracaena-trifasciata-zeylanica': {
+    tagline: {
+      ar: 'جلد نمر طويل بأوراق فاتحة وأشرطة داكنة. قوي جدًا ويحتاج ري قليل.',
+      en: 'A tall snake plant with pale, dark-banded leaves. Very tough and needs little water.',
+    },
+    use: { ar: 'زينة أرضية طويلة', en: 'Tall floor ornamental' },
+    caution: { ar: 'الماء الزائد يقتلها — لا تتركها واقفة في الماء.', en: 'Too much water kills it — never let it stand in water.' },
+    needs: {
+      light: { ideal: 3, min: 1, max: 4, label: { ar: 'ساطع مع شمس جزئية، وتتحمل الضوء المنخفض', en: 'Bright with part sun; tolerates low light' } },
+      water: {
+        level: 1,
+        label: { ar: 'قليل — بعد جفاف التربة تمامًا', en: 'Low — after the soil fully dries' },
+        check: { ar: 'اسقِ ريًّا كاملًا بعد الجفاف التام، ولا تتركها في صحن ماء.', en: 'Water thoroughly once fully dry, and never leave it sitting in water.' },
+      },
+      schedule: [
+        { icon: 'summer', label: growing, value: { ar: 'بعد جفاف التربة بين كل رية', en: 'Let the soil dry between waterings' } },
+        { icon: 'winter', label: winter, value: { ar: 'كل 1–2 شهر', en: 'Every 1–2 months' } },
+      ],
+      temperature: { min: 13, max: 29, lowest: 10 },
+      humidity: { level: 1, label: { ar: 'تتحمل الجو الجاف', en: 'Tolerates dry air' } },
+      maintenance: 'low',
+      growth: 'medium',
+      toxicity: 'low',
+    },
+    sections: [
+      {
+        title: { ar: 'الوصف', en: 'About' },
+        icon: 'about',
+        items: [
+          { label: { ar: 'الشكل', en: 'Form' }, value: { ar: 'أوراق قائمة سيفية فاتحة اللون تعبرها أشرطة خضراء داكنة متعرجة، بدون حواف صفراء.', en: 'Upright sword-like pale leaves crossed by dark green zigzag bands, with no yellow edge.' } },
+          { label: { ar: 'الحجم', en: 'Size' }, value: { ar: 'نحو 75 سم إلى متر.', en: 'About 75 cm to 1 m.' } },
+          { label: { ar: 'الاسم', en: 'Name' }, value: { ar: 'يُباع باسم Sansevieria zeylanica، والنوع الحقيقي بهذا الاسم من سريلانكا وجنوب الهند ونادر في الزراعة.', en: 'Sold as Sansevieria zeylanica; the true species of that name is from Sri Lanka and southern India and rare in cultivation.' } },
+          { label: { ar: 'الإزهار', en: 'Flowers' }, value: { ar: 'أزهار صغيرة بيضاء مخضرة عطرية في الربيع، ونادرًا ما تظهر داخل المنزل.', en: 'Small fragrant greenish-white flowers in spring, rarely seen indoors.' } },
+        ],
+      },
+      {
+        title: { ar: 'التربية', en: 'Care' },
+        icon: 'grow',
+        items: [
+          { label: { ar: 'الضوء', en: 'Light' }, value: { ar: 'تتحمل من الضوء المنخفض إلى الشمس الكاملة، وأفضلها ساطع مع شمس جزئية.', en: 'Handles low light to full sun; best bright with part sun.' } },
+          { label: { ar: 'التربة', en: 'Soil' }, value: { ar: 'خليط صبار أو تربة رملية جيدة التصريف.', en: 'Cactus mix or sandy, well-drained soil.' } },
+          { label: { ar: 'الإكثار', en: 'Propagation' }, value: { ar: 'القسمة أو العقل الورقية.', en: 'Division or leaf cuttings.' } },
+        ],
+      },
+      {
+        title: { ar: 'الأمراض والآفات', en: 'Problems' },
+        icon: 'pests',
+        items: [
+          { label: { ar: 'أمراض', en: 'Diseases' }, value: { ar: 'تعفن الجذور من الري الزائد هو المشكلة الرئيسية.', en: 'Root rot from overwatering is the main problem.' } },
+          { label: { ar: 'آفات', en: 'Pests' }, value: { ar: 'بق دقيقي، عناكب حمراء، حشرات قشرية، وتربس.', en: 'Mealybugs, spider mites, scale, and thrips.' } },
+          { tone: 'danger', label: { ar: 'علامة خطر', en: 'Danger sign' }, value: { ar: 'أوراق طرية أو بنية عند القاعدة مع رائحة كريهة للتربة.', en: 'Soft or brown leaf bases with a foul-smelling soil.' } },
+        ],
+      },
+      {
+        title: { ar: 'الاستخدام والسلامة', en: 'Use and safety' },
+        icon: 'safety',
+        items: [
+          { label: { ar: 'استخدامها', en: 'Use' }, value: { ar: 'نبات أرضي طويل للزوايا والمداخل.', en: 'A tall floor plant for corners and entries.' } },
+          { label: { ar: 'العمر', en: 'Life' }, value: { ar: 'متينة وسهلة النمو ويصعب أن تموت.', en: 'Durable, easily grown, and difficult to kill.' } },
+          { label: { ar: 'السلامة', en: 'Safety' }, value: { ar: 'سامة للقطط والكلاب، وعصارتها قد تهيّج الجلد.', en: 'Toxic to cats and dogs; the sap can irritate skin.' } },
+        ],
+      },
+    ],
+  },
 }
 
 export const getProfile = (id: string): PracticalProfile => practicalProfiles[id]
