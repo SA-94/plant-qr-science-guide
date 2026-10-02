@@ -767,6 +767,16 @@ export const plants: Plant[] = [
         url: 'https://gardeningsolutions.ifas.ufl.edu/plants/houseplants/light-for-houseplants/',
         note: { ar: 'مقياس شدة الضوء المستخدم في النسب.', en: 'Light scale used for the percentages.' },
       },
+      {
+        label: 'LLIFLE - Sansevieria trifasciata Golden Hahnii',
+        url: 'https://llifle.eu/Encyclopedia/SUCCULENTS/Family/Dracaenaceae/29940/Sansevieria_trifasciata_cv._Golden_Hahnii',
+        note: { ar: 'وصف الصنف وأصله وبراءته النباتية.', en: 'Cultivar description, origin, and plant patent.' },
+      },
+      {
+        label: 'Gardenia.net - Golden Hahnii',
+        url: 'https://www.gardenia.net/plant/sansevieria-trifasciata-golden-hahniii-snake-plant',
+        note: { ar: 'الحجم وشكل الوردة.', en: 'Size and rosette form.' },
+      },
     ],
   },
 ]

@@ -4,6 +4,7 @@ import {
   Droplet,
   Droplets,
   GlassWater,
+  Info,
   ShieldCheck,
   Snowflake,
   Sprout,
@@ -19,6 +20,7 @@ import type { PlantNeeds, ProfileSection, ScheduleIcon } from './profiles'
 const TEMP_SCALE = 40
 
 const sectionIcons: Record<ProfileSection['icon'], LucideIcon> = {
+  about: Info,
   use: Sprout,
   grow: Sprout,
   light: Sun,

@@ -1,6 +1,6 @@
 import type { Lang } from './data'
 
-type ProfileIcon = 'use' | 'grow' | 'light' | 'water' | 'pests' | 'safety'
+type ProfileIcon = 'about' | 'use' | 'grow' | 'light' | 'water' | 'pests' | 'safety'
 
 type Text = Record<Lang, string>
 
@@ -359,6 +359,16 @@ const practicalProfiles: Record<string, PracticalProfile> = {
       toxicity: 'low',
     },
     sections: [
+      {
+        title: { ar: 'الوصف', en: 'About' },
+        icon: 'about',
+        items: [
+          { label: { ar: 'الشكل', en: 'Form' }, value: { ar: 'وردة قزمية كثيفة تشبه عش الطائر، أوراقها خضراء رمادية بأشرطة صفراء على الحواف وداخل الورقة.', en: "A dense dwarf rosette like a bird's nest; grey-green leaves with yellow bands along the edges and inside the leaf." } },
+          { label: { ar: 'الحجم', en: 'Size' }, value: { ar: 'نحو 15–20 سم ارتفاعًا.', en: 'About 15–20 cm tall.' } },
+          { label: { ar: 'أصل الصنف', en: 'Origin' }, value: { ar: 'اكتشفه Sylvan Hahn، وسُجّل ببراءة نباتية رقم 1224 عام 1953، من سلالة «Hahnii» التي ظهرت عام 1939.', en: "Found by Sylvan Hahn and patented in 1953 (Plant Patent 1224), from the 'Hahnii' line that appeared in 1939." } },
+          { label: { ar: 'الإزهار', en: 'Flowers' }, value: { ar: 'أزهار صغيرة بيضاء مخضرة عطرية في الربيع، ونادرًا ما تظهر داخل المنزل.', en: 'Small fragrant greenish-white flowers in spring, rarely seen indoors.' } },
+        ],
+      },
       {
         title: { ar: 'التربية', en: 'Care' },
         icon: 'grow',
