@@ -20,20 +20,34 @@ export type ProfileSection = {
 export type ScheduleIcon = 'summer' | 'winter' | 'vase' | 'pot'
 
 /**
- * The numbers behind the care gauges. They are teaching approximations of the
- * prose in data.ts (and its sources), not lab measurements:
- * - light: 0 = deep shade, 100 = full direct sun all day.
- * - water: 0 = soil kept dry, 100 = roots always wet (water culture).
- * - temperature in C; humidity is relative humidity in %.
+ * Light follows the UF/IFAS houseplant scale; each level is drawn as 25% of the ring:
+ * 1 low (25-100 fc), 2 medium (100-500 fc), 3 high (500-1000 fc), 4 direct sun (>1000 fc, 4+ h).
+ */
+export type LightLevel = 1 | 2 | 3 | 4
+
+/**
+ * Watering uses the wording the sources use, again 25% per step:
+ * 1 dry out completely, 2 top layer dries, 3 evenly moist, 4 roots in water.
+ */
+export type WaterLevel = 1 | 2 | 3 | 4
+
+/**
+ * Every value below is taken from the sources listed on the plant in data.ts
+ * (NC State, UF/IFAS, Clemson HGIC, RHS, Costa Farms, ASPCA). Nothing is estimated:
+ * where a source gives no number the field is left out and the page says so in words.
  */
 export type PlantNeeds = {
-  light: { ideal: number; min: number; max: number; label: Text }
-  water: { level: number; label: Text; check: Text }
+  light: { ideal: LightLevel; min: LightLevel; max: LightLevel; label: Text }
+  water: { level: WaterLevel; label: Text; check: Text }
   schedule: { icon: ScheduleIcon; label: Text; value: Text }[]
-  temperature: { min: number; max: number; lowest: number }
-  humidity: { min: number; max: number }
-  ease: 1 | 2 | 3
-  growth: 'slow' | 'medium' | 'fast'
+  /** Ideal range in C when a source gives one, and the lowest temperature it should see. */
+  temperature: { min?: number; max?: number; lowest: number }
+  /** 1 tolerates dry air, 2 average, 3 humid. `min` only when a source gives a percentage. */
+  humidity: { level: 1 | 2 | 3; min?: number; label: Text }
+  /** NC State "Maintenance" rating. */
+  maintenance: 'low' | 'medium' | 'high'
+  growth: 'slow' | 'medium' | 'mediumFast' | 'fast'
+  /** NC State "Poison Severity". */
   toxicity: 'low' | 'medium'
 }
 
@@ -47,6 +61,7 @@ export type PracticalProfile = {
 
 const summer = { ar: 'الصيف', en: 'Summer' }
 const winter = { ar: 'الشتاء', en: 'Winter' }
+const growing = { ar: 'الربيع إلى الخريف', en: 'Spring to autumn' }
 
 const practicalProfiles: Record<string, PracticalProfile> = {
   'catharanthus-roseus': {
@@ -57,20 +72,20 @@ const practicalProfiles: Record<string, PracticalProfile> = {
     use: { ar: 'زينة مزهرة فقط', en: 'Flowering ornamental only' },
     caution: { ar: 'لا تؤكل — زينة فقط وليست علاجًا منزليًا.', en: 'Not edible — ornamental only, not a home remedy.' },
     needs: {
-      light: { ideal: 90, min: 55, max: 100, label: { ar: 'شمس مباشرة أو ضوء قوي جدًا', en: 'Full sun or very bright light' } },
+      light: { ideal: 4, min: 3, max: 4, label: { ar: 'شمس كاملة — 6 ساعات فأكثر تزيد الإزهار', en: 'Full sun — 6+ hours boosts flowering' } },
       water: {
-        level: 50,
-        label: { ar: 'معتدل — بعد جفاف السطح', en: 'Moderate — after the surface dries' },
-        check: { ar: 'اسقِ عندما تجف أعلى 2–3 سم من التربة، ولا تترك ماء في الصحن.', en: 'Water when the top 2–3 cm of soil is dry, and never leave water in the saucer.' },
+        level: 2,
+        label: { ar: 'معتدل — تتحمل الجفاف', en: 'Moderate — drought tolerant' },
+        check: { ar: 'اسقِ ريًّا عميقًا ثم اتركها تجف؛ الري المتكرر يسبب تعفن الجذور والساق.', en: 'Water deeply, then let it dry; frequent watering causes root and stem rot.' },
       },
       schedule: [
-        { icon: 'summer', label: summer, value: { ar: 'كل 3–4 أيام تقريبًا', en: 'About every 3–4 days' } },
-        { icon: 'winter', label: winter, value: { ar: 'مرة أسبوعيًا تقريبًا', en: 'About once a week' } },
+        { icon: 'summer', label: summer, value: { ar: 'ري عميق مرة أسبوعيًا تقريبًا', en: 'Deep watering about once a week' } },
+        { icon: 'winter', label: winter, value: { ar: 'قلّل الري', en: 'Water less' } },
       ],
-      temperature: { min: 20, max: 30, lowest: 10 },
-      humidity: { min: 40, max: 60 },
-      ease: 3,
-      growth: 'fast',
+      temperature: { lowest: 10 },
+      humidity: { level: 1, label: { ar: 'لا تحتاج رطوبة خاصة — المهم التهوية', en: 'No special humidity — airflow matters' } },
+      maintenance: 'low',
+      growth: 'mediumFast',
       toxicity: 'low',
     },
     sections: [
@@ -78,27 +93,27 @@ const practicalProfiles: Record<string, PracticalProfile> = {
         title: { ar: 'التربية', en: 'Care' },
         icon: 'grow',
         items: [
-          { label: { ar: 'الضوء', en: 'Light' }, value: { ar: 'شمس صباح أو ضوء قوي جدًا.', en: 'Morning sun or very bright light.' } },
-          { label: { ar: 'التربة', en: 'Soil' }, value: { ar: 'خليط خفيف مع بيرلايت وتصريف سريع.', en: 'Light mix with perlite and fast drainage.' } },
-          { label: { ar: 'الإكثار', en: 'Propagation' }, value: { ar: 'بذور أو عقل طرية في جو دافئ.', en: 'Seeds or soft cuttings in warm conditions.' } },
+          { label: { ar: 'الضوء', en: 'Light' }, value: { ar: 'الشمس الكاملة تزيد الإزهار، وتتحمل الظل الجزئي.', en: 'Full sun increases blooms; partial shade is tolerated.' } },
+          { label: { ar: 'التربة', en: 'Soil' }, value: { ar: 'جيدة التصريف، وتفضل الحموضة الخفيفة (pH 5.5–6.0).', en: 'Well drained, slightly acidic preferred (pH 5.5–6.0).' } },
+          { label: { ar: 'الإكثار', en: 'Propagation' }, value: { ar: 'بذور تنبت خلال أسبوع عند 21–24°م، أو عقل طرية صيفًا.', en: 'Seed germinates in a week at 21–24 C, or softwood cuttings in summer.' } },
         ],
       },
       {
         title: { ar: 'الأمراض والآفات', en: 'Problems' },
         icon: 'pests',
         items: [
-          { label: { ar: 'أمراض', en: 'Diseases' }, value: { ar: 'تعفن جذور، ذبول، وتبقعات أوراق.', en: 'Root rot, wilt, and leaf spots.' } },
-          { label: { ar: 'آفات', en: 'Pests' }, value: { ar: 'من، عناكب حمراء، وبق دقيقي.', en: 'Aphids, spider mites, and mealybugs.' } },
-          { tone: 'danger', label: { ar: 'علامة خطر', en: 'Danger sign' }, value: { ar: 'اسوداد قاعدة الساق أو ذبول مفاجئ.', en: 'Black stem base or sudden wilt.' } },
+          { label: { ar: 'أمراض', en: 'Diseases' }, value: { ar: 'تعفن الجذور والساق (فايتوفثورا)، ذبول فيوزاريوم، وتبقعات أوراق — أغلبها من الري الزائد.', en: 'Phytophthora root and stem rot, Fusarium wilt, leaf spots — mostly from overwatering.' } },
+          { label: { ar: 'آفات', en: 'Pests' }, value: { ar: 'لا آفات رئيسية؛ تحت البيوت المحمية: ذبابة بيضاء وعناكب حمراء.', en: 'No major pests; under glass: whitefly and spider mites.' } },
+          { tone: 'danger', label: { ar: 'علامة خطر', en: 'Danger sign' }, value: { ar: 'بقع بنية إلى سوداء على الساق مع ذبول مفاجئ.', en: 'Dark brown to black stem lesions with sudden wilting.' } },
         ],
       },
       {
         title: { ar: 'الاستخدام والسلامة', en: 'Use and safety' },
         icon: 'safety',
         items: [
-          { label: { ar: 'استخدامها', en: 'Use' }, value: { ar: 'أحواض، مداخل، وشرفات مضيئة.', en: 'Beds, entries, and bright balconies.' } },
-          { label: { ar: 'العمر', en: 'Life' }, value: { ar: 'غالبًا موسمية، وتطول في الجو الدافئ.', en: 'Often seasonal; lasts longer in warmth.' } },
-          { label: { ar: 'السلامة', en: 'Safety' }, value: { ar: 'زينة فقط، وليست علاجًا منزليًا.', en: 'Ornamental only, not a home remedy.' } },
+          { label: { ar: 'استخدامها', en: 'Use' }, value: { ar: 'أحواض، أصص، وسلال معلقة في مكان مشمس.', en: 'Beds, containers, and hanging baskets in sun.' } },
+          { label: { ar: 'العمر', en: 'Life' }, value: { ar: 'معمّرة في المناطق الدافئة، وتُزرع غالبًا كحولية موسمية.', en: 'Perennial in warm zones; usually grown as a seasonal annual.' } },
+          { label: { ar: 'السلامة', en: 'Safety' }, value: { ar: 'سامة للحيوانات الأليفة، وليست علاجًا منزليًا.', en: 'Toxic to pets, and not a home remedy.' } },
         ],
       },
     ],
@@ -109,22 +124,22 @@ const practicalProfiles: Record<string, PracticalProfile> = {
       en: 'An easy indoor plant for water or soil. Clean water and indirect light matter most.',
     },
     use: { ar: 'زينة مكتبية', en: 'Desk ornamental' },
-    caution: { ar: 'ليست بامبو حقيقي — والماء الراكد يعفّن الساق.', en: 'Not true bamboo — and stagnant water rots the cane.' },
+    caution: { ar: 'ليست بامبو حقيقي — والماء الزائد يعفّن الساق.', en: 'Not true bamboo — and too much water rots the cane.' },
     needs: {
-      light: { ideal: 55, min: 30, max: 70, label: { ar: 'داخل مضيء بضوء غير مباشر', en: 'Bright indoor spot, indirect light' } },
+      light: { ideal: 3, min: 1, max: 3, label: { ar: 'ساطع غير مباشر — الشمس المباشرة تحرق الأوراق', en: 'Bright indirect — direct sun burns the leaves' } },
       water: {
-        level: 85,
-        label: { ar: 'ماء نظيف دائمًا أو تربة رطبة', en: 'Clean water or lightly moist soil' },
-        check: { ar: 'استخدم ماء خالي من الكلور، وأبقِ الماء فوق الجذور فقط.', en: 'Use chlorine-free water and keep it just above the roots.' },
+        level: 4,
+        label: { ar: 'في الماء، أو تربة تُسقى عند جفاف سطحها', en: 'In water, or soil watered when the top dries' },
+        check: { ar: 'في الماء: يغطي الجذور و2.5 سم من الساق، واستخدم ماء خاليًا من الكلور.', en: 'In water: cover the roots and 2.5 cm of stem, using chlorine-free water.' },
       },
       schedule: [
         { icon: 'vase', label: { ar: 'في الماء', en: 'In water' }, value: { ar: 'غيّر الماء كل أسبوع', en: 'Change the water weekly' } },
-        { icon: 'pot', label: { ar: 'في التربة', en: 'In soil' }, value: { ar: 'عند جفاف السطح قليلًا', en: 'When the surface just dries' } },
+        { icon: 'pot', label: { ar: 'في التربة', en: 'In soil' }, value: { ar: 'عند جفاف أول 2.5 سم', en: 'When the top 2.5 cm is dry' } },
       ],
-      temperature: { min: 18, max: 32, lowest: 10 },
-      humidity: { min: 50, max: 70 },
-      ease: 2,
-      growth: 'medium',
+      temperature: { min: 18, max: 30, lowest: 18 },
+      humidity: { level: 2, label: { ar: 'متوسطة — الجو الجاف يُسمّر أطراف الأوراق', en: 'Average — dry air browns leaf tips' } },
+      maintenance: 'medium',
+      growth: 'slow',
       toxicity: 'low',
     },
     sections: [
@@ -132,27 +147,27 @@ const practicalProfiles: Record<string, PracticalProfile> = {
         title: { ar: 'التربية', en: 'Care' },
         icon: 'water',
         items: [
-          { label: { ar: 'في الماء', en: 'In water' }, value: { ar: 'غيّر الماء أسبوعيًا واستخدم ماء خالي من الكلور.', en: 'Change water weekly and use chlorine-free water.' } },
-          { label: { ar: 'في التربة', en: 'In soil' }, value: { ar: 'خليط خفيف ورطب بدون إغراق.', en: 'Light, moist mix without soaking.' } },
-          { label: { ar: 'الإكثار', en: 'Propagation' }, value: { ar: 'عقل ساقية من ساق صحي.', en: 'Stem cuttings from healthy canes.' } },
+          { label: { ar: 'في الماء', en: 'In water' }, value: { ar: 'غيّر الماء أسبوعيًا واستخدم ماء خاليًا من الكلور.', en: 'Change water weekly and use chlorine-free water.' } },
+          { label: { ar: 'في التربة', en: 'In soil' }, value: { ar: 'تربة أصص جيدة التصريف، ولا تترك ماء في الصحن.', en: 'Well-drained potting mix; never leave water in the saucer.' } },
+          { label: { ar: 'الإكثار', en: 'Propagation' }, value: { ar: 'عقل من النمو الجديد تُجذَّر في الماء خلال 2–3 أسابيع.', en: 'New-growth cuttings root in water within 2–3 weeks.' } },
         ],
       },
       {
         title: { ar: 'الأمراض والآفات', en: 'Problems' },
         icon: 'pests',
         items: [
-          { label: { ar: 'أمراض', en: 'Diseases' }, value: { ar: 'تعفن ساق أو جذور من الماء الراكد.', en: 'Stem or root rot from stagnant water.' } },
-          { label: { ar: 'آفات', en: 'Pests' }, value: { ar: 'بق دقيقي، عناكب حمراء، وقشريات.', en: 'Mealybugs, spider mites, and scale.' } },
-          { tone: 'danger', label: { ar: 'علامة خطر', en: 'Danger sign' }, value: { ar: 'ساق طرية أو رائحة ماء سيئة.', en: 'Soft cane or bad-smelling water.' } },
+          { label: { ar: 'أمراض', en: 'Diseases' }, value: { ar: 'الري الزائد يسبب اصفرار الأوراق وتعفن الساق.', en: 'Overwatering causes yellow leaves and stem rot.' } },
+          { label: { ar: 'آفات', en: 'Pests' }, value: { ar: 'عناكب حمراء، بق دقيقي، منّ، وتربس.', en: 'Spider mites, mealybugs, aphids, and thrips.' } },
+          { tone: 'danger', label: { ar: 'علامة خطر', en: 'Danger sign' }, value: { ar: 'ساق تصفرّ أو تلين — علامة ماء زائد.', en: 'A cane turning yellow or soft — a sign of excess water.' } },
         ],
       },
       {
         title: { ar: 'الاستخدام والسلامة', en: 'Use and safety' },
         icon: 'safety',
         items: [
-          { label: { ar: 'استخدامها', en: 'Use' }, value: { ar: 'مكاتب، طاولات، وهدايا نباتية.', en: 'Offices, desks, and plant gifts.' } },
-          { label: { ar: 'العمر', en: 'Life' }, value: { ar: 'في التربة عادة أطول من بقائها في الماء.', en: 'Usually lasts longer in soil than in water.' } },
-          { label: { ar: 'السلامة', en: 'Safety' }, value: { ar: 'أبعدها عن الحيوانات التي تقضم النباتات.', en: 'Keep from pets that chew plants.' } },
+          { label: { ar: 'استخدامها', en: 'Use' }, value: { ar: 'مكاتب وطاولات في ضوء ساطع غير مباشر.', en: 'Offices and desks in bright indirect light.' } },
+          { label: { ar: 'النمو', en: 'Growth' }, value: { ar: 'بطيئة النمو، وتنمو في الماء أو التربة.', en: 'Slow growing, in water or in soil.' } },
+          { label: { ar: 'السلامة', en: 'Safety' }, value: { ar: 'سامة للحيوانات الأليفة، وقد تهيّج الجلد.', en: 'Toxic to pets and can irritate skin.' } },
         ],
       },
     ],
@@ -163,21 +178,21 @@ const practicalProfiles: Record<string, PracticalProfile> = {
       en: 'A calm large indoor plant. Filtered light and measured watering are key.',
     },
     use: { ar: 'زينة داخلية كبيرة', en: 'Large indoor ornamental' },
-    caution: { ar: 'حساسة للإغراق — لا تترك الأصيص مشبعًا بالماء.', en: 'Sensitive to overwatering — never leave the pot saturated.' },
+    caution: { ar: 'حساسة للإغراق والفلورايد — لا تترك الأصيص مشبعًا بالماء.', en: 'Sensitive to soggy soil and fluoride — never leave the pot saturated.' },
     needs: {
-      light: { ideal: 50, min: 30, max: 70, label: { ar: 'ضوء متوسط مرشح', en: 'Medium filtered light' } },
+      light: { ideal: 3, min: 1, max: 3, label: { ar: 'ساطع إلى متوسط مرشّح — الشمس المباشرة تحرق الأوراق', en: 'Bright to moderate filtered — direct sun burns leaves' } },
       water: {
-        level: 45,
-        label: { ar: 'معتدل — بعد جفاف جزء من التربة', en: 'Moderate — after part of the soil dries' },
-        check: { ar: 'اسقِ عندما يجف الثلث العلوي من التربة، وقلّل الري في الشتاء.', en: 'Water when the top third of the soil is dry; water less in winter.' },
+        level: 2,
+        label: { ar: 'معتدل — بعد جفاف أول 2.5–5 سم', en: 'Moderate — once the top 2.5–5 cm dries' },
+        check: { ar: 'حساسة للفلورايد؛ استخدم ماء المطر أو ماءً مفلترًا، ولا تتركها مشبعة.', en: 'Fluoride-sensitive: use rain or filtered water, and never leave it soggy.' },
       },
       schedule: [
-        { icon: 'summer', label: summer, value: { ar: 'كل 7–10 أيام تقريبًا', en: 'About every 7–10 days' } },
-        { icon: 'winter', label: winter, value: { ar: 'كل 2–3 أسابيع', en: 'Every 2–3 weeks' } },
+        { icon: 'summer', label: summer, value: { ar: 'غالبًا مرة أسبوعيًا تقريبًا', en: 'Often about once a week' } },
+        { icon: 'winter', label: winter, value: { ar: 'أقل من الصيف', en: 'Less than in summer' } },
       ],
       temperature: { min: 21, max: 27, lowest: 10 },
-      humidity: { min: 40, max: 60 },
-      ease: 2,
+      humidity: { level: 2, min: 40, label: { ar: 'تستفيد من الرذاذ إذا قلّت الرطوبة عن 30–40%', en: 'Mist if humidity drops below 30–40%' } },
+      maintenance: 'low',
       growth: 'slow',
       toxicity: 'low',
     },
@@ -186,27 +201,27 @@ const practicalProfiles: Record<string, PracticalProfile> = {
         title: { ar: 'التربية', en: 'Care' },
         icon: 'grow',
         items: [
-          { label: { ar: 'الضوء', en: 'Light' }, value: { ar: 'قوي غير مباشر أو متوسط قريب من نافذة.', en: 'Bright indirect or medium light near a window.' } },
-          { label: { ar: 'التربة', en: 'Soil' }, value: { ar: 'تربة أصص عادية مع فتحات تصريف.', en: 'Standard potting mix with drainage holes.' } },
-          { label: { ar: 'التقليم', en: 'Pruning' }, value: { ar: 'قص الساق الطويلة يشجع التفريع.', en: 'Cutting tall canes can encourage branching.' } },
+          { label: { ar: 'الضوء', en: 'Light' }, value: { ar: 'ساطع إلى متوسط مرشّح؛ الإضاءة الضعيفة جدًا تُضيّق الأوراق.', en: 'Bright to moderate filtered light; very low light narrows the leaves.' } },
+          { label: { ar: 'التربة', en: 'Soil' }, value: { ar: 'تربة أصص تجارية في أصيص بفتحات تصريف.', en: 'Commercial potting mix in a pot with drainage holes.' } },
+          { label: { ar: 'الإكثار', en: 'Propagation' }, value: { ar: 'عقل ساقية أو قمية، أو تطويق هوائي.', en: 'Stem or tip cuttings, or air layering.' } },
         ],
       },
       {
         title: { ar: 'الأمراض والآفات', en: 'Problems' },
         icon: 'pests',
         items: [
-          { label: { ar: 'أمراض', en: 'Diseases' }, value: { ar: 'تعفن جذور أو ساق من تربة مشبعة.', en: 'Root or cane rot from saturated soil.' } },
-          { label: { ar: 'آفات', en: 'Pests' }, value: { ar: 'بق دقيقي، تربس، وقشريات.', en: 'Mealybugs, thrips, and scale.' } },
-          { tone: 'danger', label: { ar: 'علامة خطر', en: 'Danger sign' }, value: { ar: 'اصفرار مستمر أو أطراف بنية كثيرة.', en: 'Persistent yellowing or many brown tips.' } },
+          { label: { ar: 'أمراض', en: 'Diseases' }, value: { ar: 'تعفن الجذور من الري الزائد أو ضعف التصريف.', en: 'Root rot from overwatering or poor drainage.' } },
+          { label: { ar: 'آفات', en: 'Pests' }, value: { ar: 'بق دقيقي، تربس، حشرات قشرية، وعناكب.', en: 'Mealybugs, thrips, scale, and mites.' } },
+          { tone: 'danger', label: { ar: 'علامة خطر', en: 'Danger sign' }, value: { ar: 'اصفرار أو احتراق أطراف الأوراق — غالبًا من الفلورايد أو الأملاح أو جفاف الهواء.', en: 'Yellow or scorched leaf tips — usually fluoride, salts, or dry air.' } },
         ],
       },
       {
         title: { ar: 'الاستخدام والسلامة', en: 'Use and safety' },
         icon: 'safety',
         items: [
-          { label: { ar: 'استخدامها', en: 'Use' }, value: { ar: 'زوايا، مكاتب، ومداخل داخلية.', en: 'Corners, offices, and indoor entries.' } },
-          { label: { ar: 'العمر', en: 'Life' }, value: { ar: 'تعيش سنوات طويلة إذا ثبت الضوء والري.', en: 'Long-lived when light and watering are stable.' } },
-          { label: { ar: 'السلامة', en: 'Safety' }, value: { ar: 'غير صالحة للأكل وقد تزعج الحيوانات.', en: 'Not edible and may bother pets.' } },
+          { label: { ar: 'استخدامها', en: 'Use' }, value: { ar: 'زوايا ومكاتب بإضاءة مرشّحة.', en: 'Corners and offices with filtered light.' } },
+          { label: { ar: 'النمو', en: 'Growth' }, value: { ar: 'بطيئة النمو.', en: 'Slow growing.' } },
+          { label: { ar: 'السلامة', en: 'Safety' }, value: { ar: 'سامة للقطط والكلاب، وعصارتها قد تهيّج الجلد.', en: 'Toxic to cats and dogs; the sap can irritate skin.' } },
         ],
       },
     ],
@@ -219,20 +234,20 @@ const practicalProfiles: Record<string, PracticalProfile> = {
     use: { ar: 'زينة داخلية قوية', en: 'Tough indoor ornamental' },
     caution: { ar: 'الماء الزائد يقتلها — الجفاف أهون عليها من الإغراق.', en: 'Too much water kills it — drought is far safer than soaking.' },
     needs: {
-      light: { ideal: 50, min: 15, max: 85, label: { ar: 'من ضوء منخفض إلى ساطع', en: 'Low to bright light' } },
+      light: { ideal: 3, min: 1, max: 4, label: { ar: 'ساطع مع 2–6 ساعات شمس، وتتحمل الضوء المنخفض', en: 'Bright with 2–6 h of sun; tolerates low light' } },
       water: {
-        level: 20,
+        level: 1,
         label: { ar: 'قليل — بعد جفاف التربة تمامًا', en: 'Low — after the soil fully dries' },
-        check: { ar: 'أدخل عودًا خشبيًا للقاع؛ إذا خرج جافًا تمامًا فاسقِ.', en: 'Push a wooden stick to the bottom; water only if it comes out fully dry.' },
+        check: { ar: 'لا تصب الماء في وسط الوردة؛ الري الزائد يعفّن الجذور.', en: 'Never pour water into the centre of the rosette; overwatering rots the roots.' },
       },
       schedule: [
-        { icon: 'summer', label: summer, value: { ar: 'كل 2–3 أسابيع', en: 'Every 2–3 weeks' } },
+        { icon: 'summer', label: growing, value: { ar: 'بعد جفاف التربة بين كل رية', en: 'Let the soil dry between waterings' } },
         { icon: 'winter', label: winter, value: { ar: 'كل 1–2 شهر', en: 'Every 1–2 months' } },
       ],
-      temperature: { min: 18, max: 29, lowest: 10 },
-      humidity: { min: 30, max: 50 },
-      ease: 1,
-      growth: 'slow',
+      temperature: { min: 13, max: 29, lowest: 10 },
+      humidity: { level: 1, label: { ar: 'تتحمل الجو الجاف', en: 'Tolerates dry air' } },
+      maintenance: 'low',
+      growth: 'medium',
       toxicity: 'low',
     },
     sections: [
@@ -240,18 +255,18 @@ const practicalProfiles: Record<string, PracticalProfile> = {
         title: { ar: 'التربية', en: 'Care' },
         icon: 'grow',
         items: [
-          { label: { ar: 'الضوء', en: 'Light' }, value: { ar: 'تتحمل القليل، وتتحسن في ضوء غير مباشر.', en: 'Tolerates low light; improves in indirect light.' } },
-          { label: { ar: 'التربة', en: 'Soil' }, value: { ar: 'خليط صباريات أو تربة خفيفة جدًا.', en: 'Cactus mix or very light soil.' } },
-          { label: { ar: 'الإكثار', en: 'Propagation' }, value: { ar: 'القسمة أفضل وأضمن من العقل الورقية.', en: 'Division is easier and safer than leaf cuttings.' } },
+          { label: { ar: 'الضوء', en: 'Light' }, value: { ar: 'تتحمل الضوء المنخفض جدًا، وأفضلها ساطع مع شمس جزئية؛ احمها من شمس العصر الحارقة.', en: 'Tolerates very low light; best bright with part sun, shielded from hot afternoon sun.' } },
+          { label: { ar: 'التربة', en: 'Soil' }, value: { ar: 'خليط صبار أو تربة رملية جيدة التصريف، متعادلة إلى قلوية.', en: 'Cactus mix or sandy, well-drained soil, neutral to alkaline.' } },
+          { label: { ar: 'الإكثار', en: 'Propagation' }, value: { ar: 'القسمة أو العقل؛ العقل الورقية من الأصناف المبرقشة تفقد الحواف الصفراء.', en: 'Division or cuttings; leaf cuttings of variegated types lose the yellow edge.' } },
         ],
       },
       {
         title: { ar: 'الأمراض والآفات', en: 'Problems' },
         icon: 'pests',
         items: [
-          { label: { ar: 'أمراض', en: 'Diseases' }, value: { ar: 'تعفن جذور من الري الزائد.', en: 'Root rot from overwatering.' } },
-          { label: { ar: 'آفات', en: 'Pests' }, value: { ar: 'بق دقيقي، عناكب حمراء، وقشريات.', en: 'Mealybugs, spider mites, and scale.' } },
-          { tone: 'danger', label: { ar: 'علامة خطر', en: 'Danger sign' }, value: { ar: 'ورقة طرية أو قاعدة سوداء.', en: 'Soft leaf or black base.' } },
+          { label: { ar: 'أمراض', en: 'Diseases' }, value: { ar: 'تعفن الجذور من الري الزائد هو المشكلة الرئيسية.', en: 'Root rot from overwatering is the main problem.' } },
+          { label: { ar: 'آفات', en: 'Pests' }, value: { ar: 'بق دقيقي، عناكب حمراء، حشرات قشرية، وتربس.', en: 'Mealybugs, spider mites, scale, and thrips.' } },
+          { tone: 'danger', label: { ar: 'علامة خطر', en: 'Danger sign' }, value: { ar: 'أوراق طرية أو بنية عند القاعدة مع رائحة كريهة للتربة.', en: 'Soft or brown leaf bases with a foul-smelling soil.' } },
         ],
       },
       {
@@ -259,8 +274,8 @@ const practicalProfiles: Record<string, PracticalProfile> = {
         icon: 'safety',
         items: [
           { label: { ar: 'استخدامها', en: 'Use' }, value: { ar: 'غرف، مكاتب، وممرات.', en: 'Rooms, offices, and corridors.' } },
-          { label: { ar: 'العمر', en: 'Life' }, value: { ar: 'تعيش طويلًا لأنها بطيئة وقوية.', en: 'Long-lived because it grows slowly and strongly.' } },
-          { label: { ar: 'السلامة', en: 'Safety' }, value: { ar: 'أبعدها عن الأطفال والحيوانات التي تأكل النباتات.', en: 'Keep from children and pets that eat plants.' } },
+          { label: { ar: 'العمر', en: 'Life' }, value: { ar: 'متينة وسهلة النمو ويصعب أن تموت.', en: 'Durable, easily grown, and difficult to kill.' } },
+          { label: { ar: 'السلامة', en: 'Safety' }, value: { ar: 'سامة للقطط والكلاب، وعصارتها قد تهيّج الجلد.', en: 'Toxic to cats and dogs; the sap can irritate skin.' } },
         ],
       },
     ],
@@ -273,19 +288,19 @@ const practicalProfiles: Record<string, PracticalProfile> = {
     use: { ar: 'زينة داخلية راقية', en: 'Polished indoor ornamental' },
     caution: { ar: 'جذاميرها تتعفن بالماء الزائد — لا تترك الصحن ممتلئًا.', en: 'Rhizomes rot in excess water — never leave the saucer full.' },
     needs: {
-      light: { ideal: 40, min: 10, max: 65, label: { ar: 'ضوء منخفض أو مرشح', en: 'Low or filtered light' } },
+      light: { ideal: 3, min: 1, max: 3, label: { ar: 'ساطع غير مباشر — تتحمل الإضاءة المنخفضة جدًا', en: 'Bright indirect — tolerates very low light' } },
       water: {
-        level: 20,
-        label: { ar: 'قليل — بعد جفاف كامل', en: 'Low — after full dryness' },
-        check: { ar: 'الجذامير تخزن الماء؛ اسقِ فقط بعد جفاف التربة بالكامل.', en: 'The rhizomes store water; water only once the soil is completely dry.' },
+        level: 1,
+        label: { ar: 'قليل — بعد جفاف التربة كاملًا', en: 'Low — after the soil fully dries' },
+        check: { ar: 'الجذامير تخزن الماء، وقد تعيش 3–4 أشهر دون ري؛ لا تترك الصحن ممتلئًا.', en: 'The rhizomes store water and can last 3–4 months unwatered; never leave the saucer full.' },
       },
       schedule: [
-        { icon: 'summer', label: summer, value: { ar: 'مرتين في الشهر', en: 'Twice a month' } },
-        { icon: 'winter', label: winter, value: { ar: 'مرة في الشهر أو أقل', en: 'Monthly or less' } },
+        { icon: 'summer', label: summer, value: { ar: 'مرتين في الشهر بعد الجفاف الكامل', en: 'Twice a month, once fully dry' } },
+        { icon: 'winter', label: winter, value: { ar: 'مرة في الشهر', en: 'Once a month' } },
       ],
-      temperature: { min: 18, max: 26, lowest: 10 },
-      humidity: { min: 30, max: 50 },
-      ease: 1,
+      temperature: { min: 20, max: 24, lowest: 16 },
+      humidity: { level: 1, min: 40, label: { ar: 'تتحمل الجفاف، والأفضل فوق 40%', en: 'Tolerates dry air; above 40% is best' } },
+      maintenance: 'low',
       growth: 'slow',
       toxicity: 'medium',
     },
@@ -294,27 +309,27 @@ const practicalProfiles: Record<string, PracticalProfile> = {
         title: { ar: 'التربية', en: 'Care' },
         icon: 'grow',
         items: [
-          { label: { ar: 'الضوء', en: 'Light' }, value: { ar: 'تتحمل القليل، والأفضل ضوء غير مباشر.', en: 'Tolerates low light; indirect light is better.' } },
-          { label: { ar: 'التربة', en: 'Soil' }, value: { ar: 'خليط جيد التصريف مع بيرلايت.', en: 'Well-drained mix with perlite.' } },
-          { label: { ar: 'التنظيف', en: 'Cleaning' }, value: { ar: 'امسح الغبار عن الأوراق لتبقى لامعة.', en: 'Wipe leaf dust to keep the shine.' } },
+          { label: { ar: 'الضوء', en: 'Light' }, value: { ar: 'تنمو حتى تحت الإضاءة الفلورية، وأفضلها ساطع غير مباشر؛ الشمس المباشرة تحرق الأوراق.', en: 'Grows even under fluorescent light, best in bright indirect light; direct sun scalds the leaves.' } },
+          { label: { ar: 'التربة', en: 'Soil' }, value: { ar: 'تربة عضوية أو رملية جيدة التصريف، وتُعامل مثل العصاريات.', en: 'Organic or sandy well-drained mix; treat it like a succulent.' } },
+          { label: { ar: 'التسميد', en: 'Feeding' }, value: { ar: 'سماد سائل متوازن مرة أو مرتين في السنة.', en: 'Balanced liquid fertilizer once or twice a year.' } },
         ],
       },
       {
         title: { ar: 'الأمراض والآفات', en: 'Problems' },
         icon: 'pests',
         items: [
-          { label: { ar: 'أمراض', en: 'Diseases' }, value: { ar: 'تعفن جذامير وجذور من الري الزائد.', en: 'Rhizome and root rot from overwatering.' } },
-          { label: { ar: 'آفات', en: 'Pests' }, value: { ar: 'حشرات قشرية غالبًا.', en: 'Scale insects are the common pest.' } },
-          { tone: 'danger', label: { ar: 'علامة خطر', en: 'Danger sign' }, value: { ar: 'اصفرار مع ساق طرية أو رائحة تربة.', en: 'Yellowing with soft stems or bad soil smell.' } },
+          { label: { ar: 'أمراض', en: 'Diseases' }, value: { ar: 'تعفن الجذامير والجذور من الري الزائد.', en: 'Rhizome and root rot from overwatering.' } },
+          { label: { ar: 'آفات', en: 'Pests' }, value: { ar: 'قليلة الآفات؛ راقب الحشرات القشرية.', en: 'Few pests; watch for scale insects.' } },
+          { tone: 'danger', label: { ar: 'علامة خطر', en: 'Danger sign' }, value: { ar: 'اصفرار مع سيقان طرية ورائحة كريهة من التربة.', en: 'Yellowing with mushy stems and a foul soil smell.' } },
         ],
       },
       {
         title: { ar: 'الاستخدام والسلامة', en: 'Use and safety' },
         icon: 'safety',
         items: [
-          { label: { ar: 'استخدامها', en: 'Use' }, value: { ar: 'مكاتب، مداخل، وأماكن قليلة العناية.', en: 'Offices, entries, and low-care areas.' } },
-          { label: { ar: 'العمر', en: 'Life' }, value: { ar: 'تعيش طويلًا إذا قل الماء.', en: 'Long-lived when watering is sparse.' } },
-          { label: { ar: 'السلامة', en: 'Safety' }, value: { ar: 'لا تؤكل؛ عصارتها قد تهيج الفم.', en: 'Not edible; sap may irritate the mouth.' } },
+          { label: { ar: 'استخدامها', en: 'Use' }, value: { ar: 'الصغيرة للطاولات، والكبيرة للأرض والزوايا المعتمة.', en: 'Small pots for desks, large ones for floors and dim corners.' } },
+          { label: { ar: 'العمر', en: 'Life' }, value: { ar: 'بطيئة النمو وتتحمل الإهمال.', en: 'Slow growing and tolerant of neglect.' } },
+          { label: { ar: 'السلامة', en: 'Safety' }, value: { ar: 'سمية متوسطة (أوكسالات الكالسيوم) إذا أُكلت أوراقها.', en: 'Moderately toxic (calcium oxalate) if leaves are eaten.' } },
         ],
       },
     ],
@@ -327,19 +342,19 @@ const practicalProfiles: Record<string, PracticalProfile> = {
     use: { ar: 'زينة صغيرة', en: 'Small ornamental' },
     caution: { ar: 'التبرقش الأصفر يحتاج ضوء — في الظل يبهت لونها.', en: 'The yellow variegation needs light — it fades in shade.' },
     needs: {
-      light: { ideal: 65, min: 40, max: 85, label: { ar: 'ضوء ساطع غير مباشر', en: 'Bright indirect light' } },
+      light: { ideal: 3, min: 1, max: 4, label: { ar: 'ساطع مع شمس لطيفة — الضوء يحافظ على اللون الأصفر', en: 'Bright with gentle sun — light keeps the yellow' } },
       water: {
-        level: 15,
-        label: { ar: 'قليل جدًا', en: 'Very sparse' },
-        check: { ar: 'اسقِ حول الوردة لا داخلها، وفقط بعد جفاف التربة.', en: 'Water around the rosette, never into it, and only once the soil is dry.' },
+        level: 1,
+        label: { ar: 'قليل جدًا — بعد جفاف التربة', en: 'Very sparse — after the soil dries' },
+        check: { ar: 'اسقِ حول الوردة لا داخلها، واحمها من رطوبة الشتاء.', en: 'Water around the rosette, never into it, and keep it dry in winter.' },
       },
       schedule: [
-        { icon: 'summer', label: summer, value: { ar: 'كل 3 أسابيع تقريبًا', en: 'About every 3 weeks' } },
-        { icon: 'winter', label: winter, value: { ar: 'مرة في الشهر أو أقل', en: 'Monthly or less' } },
+        { icon: 'summer', label: growing, value: { ar: 'بعد جفاف التربة تمامًا', en: 'Once the soil is fully dry' } },
+        { icon: 'winter', label: winter, value: { ar: 'كل 1–2 شهر', en: 'Every 1–2 months' } },
       ],
-      temperature: { min: 18, max: 29, lowest: 10 },
-      humidity: { min: 30, max: 50 },
-      ease: 1,
+      temperature: { min: 13, max: 29, lowest: 10 },
+      humidity: { level: 1, label: { ar: 'تتحمل الجو الجاف', en: 'Tolerates dry air' } },
+      maintenance: 'low',
       growth: 'slow',
       toxicity: 'low',
     },
@@ -348,8 +363,8 @@ const practicalProfiles: Record<string, PracticalProfile> = {
         title: { ar: 'التربية', en: 'Care' },
         icon: 'grow',
         items: [
-          { label: { ar: 'الضوء', en: 'Light' }, value: { ar: 'ضوء ساطع يحافظ على اللون الأصفر.', en: 'Bright light keeps the yellow color.' } },
-          { label: { ar: 'التربة', en: 'Soil' }, value: { ar: 'خليط صباريات وتصريف ممتاز.', en: 'Cactus mix with excellent drainage.' } },
+          { label: { ar: 'الضوء', en: 'Light' }, value: { ar: 'ساطع مع شمس لطيفة؛ في الظل يبطؤ النمو ويبهت التبرقش.', en: 'Bright with gentle sun; in shade growth slows and variegation fades.' } },
+          { label: { ar: 'التربة', en: 'Soil' }, value: { ar: 'طميية أو رملية جيدة التصريف، متعادلة إلى قلوية.', en: 'Loam or sand, well drained, neutral to alkaline.' } },
           { label: { ar: 'الإكثار', en: 'Propagation' }, value: { ar: 'بالخلفات أو القسمة للحفاظ على التبرقش.', en: 'Offsets or division preserve variegation.' } },
         ],
       },
@@ -357,8 +372,8 @@ const practicalProfiles: Record<string, PracticalProfile> = {
         title: { ar: 'الأمراض والآفات', en: 'Problems' },
         icon: 'pests',
         items: [
-          { label: { ar: 'أمراض', en: 'Diseases' }, value: { ar: 'تعفن الجذور أو قلب الوردة.', en: 'Root or crown rot.' } },
-          { label: { ar: 'آفات', en: 'Pests' }, value: { ar: 'بق دقيقي، عناكب حمراء، وقشريات.', en: 'Mealybugs, spider mites, and scale.' } },
+          { label: { ar: 'أمراض', en: 'Diseases' }, value: { ar: 'تعفن الجذور أو قلب الوردة من الماء الزائد.', en: 'Root or crown rot from excess water.' } },
+          { label: { ar: 'آفات', en: 'Pests' }, value: { ar: 'بق دقيقي وعناكب حمراء، وقد يصيبها سوس الكرمة.', en: 'Mealybugs and spider mites; may get vine weevil.' } },
           { tone: 'danger', label: { ar: 'علامة خطر', en: 'Danger sign' }, value: { ar: 'ليونة الأوراق أو سواد القاعدة.', en: 'Soft leaves or black base.' } },
         ],
       },
@@ -366,9 +381,9 @@ const practicalProfiles: Record<string, PracticalProfile> = {
         title: { ar: 'الاستخدام والسلامة', en: 'Use and safety' },
         icon: 'safety',
         items: [
-          { label: { ar: 'استخدامها', en: 'Use' }, value: { ar: 'طاولات، أرفف، وأصيص صغير.', en: 'Desks, shelves, and small pots.' } },
-          { label: { ar: 'العمر', en: 'Life' }, value: { ar: 'تعيش طويلًا إذا كان الري قليلًا.', en: 'Long-lived with sparse watering.' } },
-          { label: { ar: 'السلامة', en: 'Safety' }, value: { ar: 'ضارة إذا أكلت؛ أبعدها عن الحيوانات.', en: 'Harmful if eaten; keep away from pets.' } },
+          { label: { ar: 'استخدامها', en: 'Use' }, value: { ar: 'طاولات وأرفف؛ لا تُنقل لأصيص أكبر إلا عند امتلاء الجذور.', en: 'Desks and shelves; repot only when pot-bound.' } },
+          { label: { ar: 'العمر', en: 'Life' }, value: { ar: 'بطيئة النمو وتتحمل الإهمال.', en: 'Slow growing and tolerant of neglect.' } },
+          { label: { ar: 'السلامة', en: 'Safety' }, value: { ar: 'ضارة إذا أُكلت؛ ارتدِ قفازات عند التقليم وأبعدها عن الحيوانات.', en: 'Harmful if eaten; wear gloves and keep away from pets.' } },
         ],
       },
     ],

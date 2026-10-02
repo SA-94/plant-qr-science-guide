@@ -86,8 +86,8 @@ function Gauge({
 export function NeedsPanel({ needs, lang }: { needs: PlantNeeds; lang: Lang }) {
   const t = labels[lang]
   const { light, water, temperature, humidity } = needs
-  const humidityMid = (humidity.min + humidity.max) / 2
-  const humidityLevel = humidityMid < 45 ? 'low' : humidityMid < 58 ? 'medium' : 'high'
+  const percent = (level: number) => level * 25
+  const hasRange = temperature.min !== undefined && temperature.max !== undefined
 
   return (
     <section className="needs" aria-labelledby="needs-title">
@@ -97,20 +97,25 @@ export function NeedsPanel({ needs, lang }: { needs: PlantNeeds; lang: Lang }) {
         <Gauge
           tone="light"
           label={t.light}
-          ring={<Ring to={light.ideal} icon={Sun} />}
-          value={<Num>{light.ideal}%</Num>}
+          ring={<Ring to={percent(light.ideal)} icon={Sun} />}
+          value={<Num>{percent(light.ideal)}%</Num>}
           caption={light.label[lang]}
           note={
-            <>
-              {t.tolerates} <Num>{light.min}–{light.max}%</Num>
-            </>
+            light.min !== light.max ? (
+              <>
+                {t.tolerates}{' '}
+                <Num>
+                  {percent(light.min)}–{percent(light.max)}%
+                </Num>
+              </>
+            ) : null
           }
         />
         <Gauge
           tone="water"
           label={t.water}
-          ring={<Ring to={water.level} icon={Droplet} />}
-          value={<Num>{water.level}%</Num>}
+          ring={<Ring to={percent(water.level)} icon={Droplet} />}
+          value={<Num>{percent(water.level)}%</Num>}
           caption={water.label[lang]}
         />
         <Gauge
@@ -118,31 +123,31 @@ export function NeedsPanel({ needs, lang }: { needs: PlantNeeds; lang: Lang }) {
           label={t.temperature}
           ring={
             <Ring
-              from={(temperature.min / TEMP_SCALE) * 100}
-              to={(temperature.max / TEMP_SCALE) * 100}
+              from={((hasRange ? temperature.min! : temperature.lowest) / TEMP_SCALE) * 100}
+              to={hasRange ? (temperature.max! / TEMP_SCALE) * 100 : 100}
               icon={Thermometer}
             />
           }
           value={
-            <>
-              <Num>
-                {temperature.min}–{temperature.max}
-              </Num>
-              {t.degree}
-            </>
+            hasRange ? (
+              <>
+                <Num>
+                  {temperature.min}–{temperature.max}
+                </Num>
+                {t.degree}
+              </>
+            ) : (
+              t.warm
+            )
           }
           caption={`${t.lowest} ${temperature.lowest}${t.degree}`}
         />
         <Gauge
           tone="humidity"
           label={t.humidity}
-          ring={<Ring from={humidity.min} to={humidity.max} icon={Droplets} />}
-          value={
-            <Num>
-              {humidity.min}–{humidity.max}%
-            </Num>
-          }
-          caption={t.humidityLevels[humidityLevel]}
+          ring={<Ring to={(humidity.level / 3) * 100} icon={Droplets} />}
+          value={humidity.min ? <Num>{humidity.min}%+</Num> : t.humidityLevels[humidity.level]}
+          caption={humidity.label[lang]}
         />
       </div>
 
@@ -174,9 +179,10 @@ export function NeedsPanel({ needs, lang }: { needs: PlantNeeds; lang: Lang }) {
 
 export function TraitList({ needs, use, lang }: { needs: PlantNeeds; use: string; lang: Lang }) {
   const t = labels[lang]
+  const dots = { low: 1, medium: 2, high: 3 }[needs.maintenance]
   const traits = [
     { label: t.use, value: use },
-    { label: t.ease, value: t.easeLevels[needs.ease - 1], dots: 4 - needs.ease },
+    { label: t.maintenance, value: t.maintenanceLevels[needs.maintenance], dots },
     { label: t.growth, value: t.growthLevels[needs.growth] },
     { label: t.safety, value: t.toxicityLevels[needs.toxicity], warn: true },
   ]
@@ -253,12 +259,12 @@ export function MiniNeeds({ needs, lang }: { needs: PlantNeeds; lang: Lang }) {
       <span className="mini mini-light" title={t.light}>
         <Sun size={14} aria-hidden="true" />
         <span className="sr-only">{t.light}</span>
-        <Num>{needs.light.ideal}%</Num>
+        <Num>{needs.light.ideal * 25}%</Num>
       </span>
       <span className="mini mini-water" title={t.water}>
         <Droplet size={14} aria-hidden="true" />
         <span className="sr-only">{t.water}</span>
-        <Num>{needs.water.level}%</Num>
+        <Num>{needs.water.level * 25}%</Num>
       </span>
     </span>
   )
