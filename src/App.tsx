@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Download, ExternalLink, Leaf, Printer, QrCode, TriangleAlert } from 'lucide-react'
 import { getPlantById, labels, type Lang, type Plant, plants } from './data'
+import { QrIntro } from './intro'
 import { CareGuide, MiniNeeds, NeedsPanel, TraitList } from './needs'
 import { getProfile } from './profiles'
 import { drawPlantQr, loadImage } from './qr'
@@ -38,9 +39,15 @@ const normalizePath = () => {
 
 const primaryName = (name: string) => name.split(' / ')[0]
 
+type IntroPhase = 'playing' | 'leaving' | 'done'
+
 function App() {
   const [lang, setLang] = useState<Lang>('ar')
   const [path, setPath] = useState(normalizePath)
+  // Visitors arriving from a printed QR code (/p/N) see a short intro before the plant page.
+  const [intro, setIntro] = useState<IntroPhase>(() => (normalizePath().startsWith('/p/') ? 'playing' : 'done'))
+  const leaveIntro = useCallback(() => setIntro((phase) => (phase === 'playing' ? 'leaving' : phase)), [])
+  const endIntro = useCallback(() => setIntro('done'), [])
   const t = labels[lang]
   const dir = lang === 'ar' ? 'rtl' : 'ltr'
 
@@ -49,6 +56,7 @@ function App() {
   const selectedPlant = plantId
     ? getPlantById(plantId)
     : plants.find((plant) => plant.index === shortIndex)
+  const showIntro = intro !== 'done' && selectedPlant !== undefined
 
   useEffect(() => {
     const syncPath = () => setPath(normalizePath())
@@ -62,6 +70,14 @@ function App() {
   }, [])
 
   useEffect(() => {
+    if (!showIntro) return
+    document.documentElement.style.overflow = 'hidden'
+    return () => {
+      document.documentElement.style.overflow = ''
+    }
+  }, [showIntro])
+
+  useEffect(() => {
     document.documentElement.lang = lang
     document.documentElement.dir = dir
   }, [lang, dir])
@@ -70,8 +86,24 @@ function App() {
     <div className="app" dir={dir}>
       <SiteHeader lang={lang} setLang={setLang} showQrLink={!selectedPlant} />
 
+      {selectedPlant && showIntro ? (
+        <QrIntro
+          lang={lang}
+          name={primaryName(selectedPlant.commonName[lang])}
+          scientificName={selectedPlant.scientificName}
+          image={assetPath(selectedPlant.image)}
+          seal={assetPath('/kfu-logo.svg')}
+          leaving={intro === 'leaving'}
+          onLeave={leaveIntro}
+          onDone={endIntro}
+        />
+      ) : null}
+
       {selectedPlant ? (
-        <PlantPage plant={selectedPlant} lang={lang} />
+        // Mounted as the intro leaves, so the page's own entrance plays in view.
+        intro === 'playing' && showIntro ? null : (
+          <PlantPage plant={selectedPlant} lang={lang} entering={intro === 'leaving'} />
+        )
       ) : path === '/' ? (
         <HomePage lang={lang} />
       ) : path === '/qr' ? (
@@ -227,13 +259,13 @@ function PlantQrCard({ plant, lang }: { plant: Plant; lang: Lang }) {
   )
 }
 
-function PlantPage({ plant, lang }: { plant: Plant; lang: Lang }) {
+function PlantPage({ plant, lang, entering = false }: { plant: Plant; lang: Lang; entering?: boolean }) {
   const t = labels[lang]
   const profile = getProfile(plant.id)
   const family = plant.taxonomy[0]?.value[lang] ?? ''
 
   return (
-    <main className="plant-page">
+    <main className={entering ? 'plant-page is-entering' : 'plant-page'}>
       <section className="plant-hero">
         <figure className="plant-photo">
           <img src={assetPath(plant.image)} alt={plant.commonName[lang]} />
@@ -289,10 +321,6 @@ function SiteFooter({ lang }: { lang: Lang }) {
         <p className="credit">
           <span>{t.preparedBy}</span>
           <strong>{t.studentName}</strong>
-        </p>
-        <p className="credit">
-          <span>{t.supervisedBy}</span>
-          <strong>{t.supervisorName}</strong>
         </p>
       </div>
       <p className="footer-rights">

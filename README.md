@@ -4,7 +4,7 @@
 
 A bilingual Arabic/English guide with a scientific page for each of seven plants, plus custom QR codes that open each plant page directly.
 
-عمل الطالب **فهد عبدالله فهيد القحطاني** — بإشراف الدكتور **محمد صالح آدم عبدالله** — جامعة الملك فيصل.
+عمل الطالب **فهد عبدالله فهيد القحطاني** — جامعة الملك فيصل.
 
 ## التشغيل محليًا | Local development
 
